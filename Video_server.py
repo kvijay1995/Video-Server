@@ -1,4 +1,5 @@
 import netifaces as ni
+import time
 import socket
 import cv2
 
@@ -21,20 +22,14 @@ try:
         f, img = camera.read()
         f, jpeg = cv2.imencode('.jpg',  img)
 
-        client.sendall(str(jpeg.nbytes))
-        client.sendall("\n")
+        # send image size in bytes to client
+        client.sendall(str(jpeg.nbytes) + "\n")
 
-        # receive confirmation from client
-        client.recv(1)
-
-        # send image in bytes to client
+        # send image in byte packets to client
         client.sendall(jpeg.tostring())
-
-        # receive image confirmation from client
-        client.recv(1)
 
 except KeyboardInterrupt:
     s.close()
     client.close()
     camera.release()
-    print "Server requested to die"
+    print "\nServer requested to die"
